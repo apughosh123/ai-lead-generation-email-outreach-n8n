@@ -1,0 +1,570 @@
+{
+  "name": "AI Lead Generation & Email Outreach Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "lead-generator",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -656,
+        -416
+      ],
+      "id": "e0c797f7-b011-4593-b1c9-fefd302307ea",
+      "name": "Webhook",
+      "webhookId": "0541f54f-58e7-448d-95a3-81d8a42dd96a"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Lead generation started successfully.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -496,
+        -176
+      ],
+      "id": "7218cdb6-6bd8-47ee-ae1e-50b1311b1024",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/actors/lukaskrivka~google-maps-with-contact-details/runs?token=YOUR_APIFY_API_TOKEN",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"includeWebResults\": false,\n  \"language\": \"en\",\n  \"locationQuery\": \"Japan\",\n  \"maxCrawledPlacesPerSearch\": 50,\n  \"maximumLeadsEnrichmentRecords\": 0,\n  \"scrapeDirectories\": false,\n  \"scrapeOrderOnline\": false,\n  \"scrapePlaceDetailPage\": false,\n  \"scrapeSocialMediaProfiles\": {\n    \"facebooks\": false,\n    \"instagrams\": false,\n    \"tiktoks\": false,\n    \"twitters\": false,\n    \"youtubes\": false\n    },\n  \"scrapeTableReservationProvider\": false,\n  \"searchStringsArray\": [\n    \"Restaurant\"\n  ],\n  \"skipClosedPlaces\": false,\n  \"verifyLeadsEnrichmentEmails\": false\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 300000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -304,
+        -400
+      ],
+      "id": "fb53e3bd-30ec-4b9e-9d88-0c5f133b4016",
+      "name": "Start Google Maps Scraper"
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        -176
+      ],
+      "id": "1dd41523-33ef-4a85-af18-7d04f1f274ff",
+      "name": "Wait",
+      "webhookId": "41a6de70-f728-459e-b908-ec0751ff7d7e"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/actors/lukaskrivka~google-maps-with-contact-details/runs/last/dataset/items?token=YOUR_APIFY_API_TOKEN",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        -400
+      ],
+      "id": "6314ba81-3e82-4471-8f1e-b18f753ea148",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    json: {\n      businessName: item.json.title || \"\",\n      email: item.json.email || \"\",\n      phone: item.json.phone || \"\",\n      website: item.json.website || \"\",\n      address: item.json.address || \"\",\n      city: item.json.city || \"\",\n      country: item.json.country || \"\",\n      rating: item.json.totalScore || \"\",\n      reviews: item.json.reviewsCount || \"\",\n      category: item.json.categoryName || \"\",\n      googleMaps: item.json.url || \"\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -192
+      ],
+      "id": "c4412952-97c3-413b-a0fc-3bfb8de3435c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1CAR6D--cUvYDi33tMUwC5tCctwWPq8TI-Bd8fYklMZs",
+          "mode": "list",
+          "cachedResultName": "AI Lead Generation & Email Outreach Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CAR6D--cUvYDi33tMUwC5tCctwWPq8TI-Bd8fYklMZs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CAR6D--cUvYDi33tMUwC5tCctwWPq8TI-Bd8fYklMZs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Business Name": "={{$json.businessName}}",
+            "Email": "={{$json.email}}",
+            "Phone": "={{$json.phone}}",
+            "Website": "={{$json.website}}",
+            "Address": "={{$json.address}}",
+            "City": "={{$json.city}}",
+            "Country": "={{$json.country}}",
+            "Rating": "={{$json.rating}}",
+            "Reviews": "={{$json.reviews}}",
+            "Category": "={{$json.category}}",
+            "Google Maps": "={{$json.googleMaps}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Business Name",
+              "displayName": "Business Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rating",
+              "displayName": "Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reviews",
+              "displayName": "Reviews",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Google Maps",
+              "displayName": "Google Maps",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        -448
+      ],
+      "id": "070fd635-d072-4d17-95cf-78b0769b3c15",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "5dMADFJGlBXeaF8v",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f5840faf-2d85-4976-9967-a767fe1d7059",
+              "leftValue": "={{$json.email}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d6dcc376-1ada-401c-8163-74983cde6d52",
+              "leftValue": "={{$json.website}}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        -192
+      ],
+      "id": "9299ef54-a626-4360-b509-e22b9d618e71",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.businessName }}",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1584,
+        -176
+      ],
+      "id": "aaa585e0-6072-45c9-94d5-515608bd2d25",
+      "name": "Create a draft",
+      "webhookId": "62bce5e3-c20d-4347-b62d-f7238e92e216",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "k9X1FsEeLDpa6MSU",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        720,
+        -240
+      ],
+      "id": "b2431898-3cec-4053-843c-f54bbef9f225",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert AI Sales Assistant.\n\nBusiness Name:\n{{ $json.businessName }}\n\nCategory:\n{{ $json.category }}\n\nCity:\n{{ $json.city }}\n\nWrite a personalized cold outreach email.\n\nRules:\n- Under 120 words\n- No subject\n- Return ONLY the email body.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        992,
+        -368
+      ],
+      "id": "2d33ee30-16b8-467f-ba34-b172f08369be",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        976,
+        -128
+      ],
+      "id": "a1150ecb-aef0-425c-be8b-2337a81c607f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "0ddZpVeUdLQoPfOz",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab86ff3f-073d-4d02-ab88-4d67e999e6ec",
+              "name": "businessName",
+              "value": "={{ $('Loop Over Items').item.json.businessName }}",
+              "type": "string"
+            },
+            {
+              "id": "df0a6402-829c-425e-a055-1564717a2a24",
+              "name": "email",
+              "value": "={{ $('Loop Over Items').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "213bf2d0-6548-4087-9b27-016c273ecf6a",
+              "name": "text",
+              "value": "={{ $('Basic LLM Chain').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        -176
+      ],
+      "id": "9c3e47d5-97d6-4747-a8b7-1e37fb494edd",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Start Google Maps Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Google Maps Scraper": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft": {
+      "main": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "be8bdeab-5436-4f3c-950c-657978def6ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a2722732ac6e7a4dd8b19a9a2e10278bebb09f92074d992974928382839956ee",
+    "githubSafeExport": true,
+    "securityNote": "Apify API token replaced with YOUR_APIFY_API_TOKEN. Configure your own secret before running."
+  },
+  "nodeGroups": [],
+  "id": "jbkaXnGyNMjjOucm",
+  "tags": []
+}
